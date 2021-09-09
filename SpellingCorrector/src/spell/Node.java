@@ -2,8 +2,13 @@ package spell;
 
 public class Node implements INode{
 
-    private int counter = 0;
+    private int counter;
     public Node[] children;
+
+    public Node() {
+        children = new Node[26];
+        counter = 0;
+    }
 
     @Override
     public int getValue() {

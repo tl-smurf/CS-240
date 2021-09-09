@@ -8,7 +8,7 @@ import java.util.*;
 public class SpellCorrector implements ISpellCorrector{
     //@Override
     //TODO: Figure out where to put the dictionary and set... Having it here you can't override
-    Dictionary<String, Integer> myDictionary = new Hashtable<>();
+    Trie myDictionary = new Trie();
     public void useDictionary(String dictionaryFileName) throws IOException {
         //Creates Dictionary: this is where the code on line 10 used to be
         //Makes File stream to read in dictionary
@@ -21,13 +21,7 @@ public class SpellCorrector implements ISpellCorrector{
             String[] currLine = scanner.nextLine().split("\\s+");
             //If key is in map, increment its value
             for (String currWord : currLine) {
-                if (myDictionary.get(currWord) != null) {
-                    myDictionary.put(currWord, myDictionary.get(currWord) + 1);
-                }
-                //Create new key, value pair
-                else {
-                    myDictionary.put(currWord,1);
-                }
+                    myDictionary.add(currWord);
             }
 
         }
@@ -88,7 +82,7 @@ public class SpellCorrector implements ISpellCorrector{
 
     //checks to see if word is in dictionary
     public boolean checkDictionary(String wordIn) {
-        if (myDictionary.get(wordIn) != null) {
+        if (myDictionary.find(wordIn) != null) {
             return true;
         }
         else {
@@ -96,27 +90,31 @@ public class SpellCorrector implements ISpellCorrector{
         }
     }
 
-    public String chooseWinner(Map<String, Integer> myDic) {
-        //TODO: make this take into account ties...
-        Integer currMax = -1;
-        String WINNER = "You should never see this";
-        for (Map.Entry<String, Integer> currentWord : myDic.entrySet()) {
-            if (currentWord.getValue() > currMax) {
-                currMax = currentWord.getValue();
-                WINNER = currentWord.getKey();
+    public String chooseWinner(String wordToCheck, String currentWinner) {
+        if (currentWinner == "abcdefghijklmnopqrstuvwxyz") {
+            return wordToCheck;
+        }
+        else if (myDictionary.find(wordToCheck).getValue() > myDictionary.find(currentWinner).getValue()) {
+            return wordToCheck;
+        }
+        else if (myDictionary.find(wordToCheck).getValue() < myDictionary.find(currentWinner).getValue()) {
+            return currentWinner;
+        }
+        else {
+            if (currentWinner.compareTo(wordToCheck) < 0) {
+                return currentWinner;
             }
             else {
-                continue;
+                return wordToCheck;
             }
         }
-        return WINNER;
     }
 
     @Override
     public String suggestSimilarWord(String inputWord) {
         //Make the alphabet into an iterable list of char
         //Lowercases the input word
-        Map<String,Integer> winnerList = new Hashtable<>();
+        String winningWord = "abcdefghijklmnopqrstuvwxyz";
         inputWord = inputWord.toLowerCase(Locale.ROOT);
         if (checkDictionary(inputWord)) {
             return inputWord;
@@ -125,10 +123,10 @@ public class SpellCorrector implements ISpellCorrector{
             Set<String> ED1 = makeWordSet(inputWord);
             for (String currWord : ED1) {
                 if (checkDictionary(currWord)) {
-                    winnerList.put(currWord ,myDictionary.get(currWord));
+                    winningWord = chooseWinner(currWord, winningWord);
                 }
             }
-            if (winnerList.isEmpty()) {
+            if (winningWord == "abcdefghijklmnopqrstuvwxyz") {
                 //Make ED2
                 Set<String> ED2 = new HashSet<String>();
                 for (String currWord : ED1) {
@@ -136,18 +134,18 @@ public class SpellCorrector implements ISpellCorrector{
                 }
                 for (String currWord : ED2) {
                     if (checkDictionary(currWord)) {
-                        winnerList.put(currWord,myDictionary.get(currWord));
+                        winningWord = chooseWinner(currWord, winningWord);
                     }
                 }
-                if (winnerList.isEmpty()) {
+                if (winningWord == "abcdefghijklmnopqrstuvwxyz") {
                     return null;
                 }
                 else {
-                    return chooseWinner(winnerList);
+                    return winningWord;
                 }
             }
             else {
-                return chooseWinner(winnerList);
+                return winningWord;
             }
         }
     }

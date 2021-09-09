@@ -51,11 +51,11 @@ public class Trie implements ITrie{
 
         for (int i = 0; i < wordChars.length; i++) {
             //word is not in Trie
-            if (currNode.children[wordChars[i - 'a']] == null) {
+            if (currNode.children[wordChars[i] - 'a'] == null) {
                 return null;
             }
             //increment node
-            currNode = currNode.children[wordChars[i - 'a']];
+            currNode = currNode.children[wordChars[i] - 'a'];
         }
         //Checks to see if it is a word
         if (currNode.getValue() == 0) {
