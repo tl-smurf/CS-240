@@ -37,7 +37,12 @@ public class Trie implements ITrie{
             //if this is the last letter of word, increment word count
             if (i == wordChars.length - 1) {
                 currNode.incrementValue();
-                wordCount++; //TODO: see if i need to put this just at the beginning of function
+                if (currNode.getValue() > 1) {
+
+                }
+                else {
+                    wordCount++; //TODO: see if i need to put this just at the beginning of function
+                }
             }
         }
     }
@@ -110,11 +115,15 @@ public class Trie implements ITrie{
         Node[] newNodes = newNode.children;;
         for (int i = 0; i < 26; i++) {
             areTheyEquals = checkDemNodes(ogNodes[i], newNodes[i]);
+            if (areTheyEquals == false) {
+                return false;
+            }
         }
         return areTheyEquals;
     }
 
     @Override
+    //Make sure testing frequency
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -150,6 +159,9 @@ public class Trie implements ITrie{
                 trieTraverse(nextLetter, wordBuilder, listBuilder);
                 currLetter++;
             }
+            else {
+                currLetter++;
+            }
         }
         if (wordBuilder.length() != 0) {
             wordBuilder.delete(wordBuilder.length() - 1, wordBuilder.length());
@@ -163,6 +175,7 @@ public class Trie implements ITrie{
         StringBuilder wordBuilder = new StringBuilder();
         StringBuilder listBuilder = new StringBuilder();
         trieTraverse(root, wordBuilder, listBuilder);
+        System.out.println(listBuilder.toString());
         return listBuilder.toString();
     }
 }
